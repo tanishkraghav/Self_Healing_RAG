@@ -18,6 +18,7 @@ RUN pip install --no-cache-dir pydantic-settings
 
 COPY backend /app/backend
 COPY --from=frontend-builder /app/frontend/dist /usr/share/nginx/html
+COPY --from=frontend-builder /app/frontend/dist /app/backend/static
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 COPY root-entrypoint.sh /app/root-entrypoint.sh
 RUN chmod +x /app/root-entrypoint.sh && mkdir -p /app/backend/data/chroma /app/backend/data/uploads
