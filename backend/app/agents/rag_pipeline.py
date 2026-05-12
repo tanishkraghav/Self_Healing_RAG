@@ -295,6 +295,12 @@ def run_pipeline(query: str) -> dict:
 
     final_state = rag_graph.invoke(initial_state)
 
+    # If the pipeline ended on a graceful fallback, show it as fallback
+    # rather than a critic pass, since the answer is intentionally non-factual.
+    if final_state["answer"].startswith("I was unable"):
+        final_state["critic_score"] = 0.0
+        final_state["critic_passed"] = False
+
     return {
         "query": query,
         "answer": final_state["answer"],
