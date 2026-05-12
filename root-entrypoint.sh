@@ -12,6 +12,7 @@ echo "✓ GROQ_API_KEY loaded"
 mkdir -p /app/backend/data/chroma /app/backend/data/uploads
 cd /app/backend
 
-uvicorn main:app --host 0.0.0.0 --port 8000 &
+echo "Starting backend on port 8000"
+python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
 
 nginx -g 'daemon off;'
