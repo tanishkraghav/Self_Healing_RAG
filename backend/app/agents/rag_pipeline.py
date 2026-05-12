@@ -71,8 +71,9 @@ critic_llm = ChatGroq(
 
 GENERATE_PROMPT = ChatPromptTemplate.from_messages([
     ("system", """You are a precise, grounded assistant. Answer the question using ONLY the provided context.
-If the context does not contain enough information, say exactly: "INSUFFICIENT_CONTEXT"
+If the context does not contain enough information, say exactly: "INSUFFICIENT_CONTEXT" and nothing else.
 Do not hallucinate. Do not add information beyond what is in the context.
+If the context is empty or does not support a factual answer, do not invent SQL or any code.
 Be concise and cite which part of the context supports your answer."""),
     ("human", """Context:
 {context}
@@ -133,6 +134,13 @@ def retrieve_node(state: RAGState) -> dict:
 
 
 def generate_node(state: RAGState) -> dict:
+    if not state["documents"]:
+        answer = "INSUFFICIENT_CONTEXT"
+        return {
+            "answer": answer,
+            "trace": [{"node": "generate", "detail": "No context chunks available — returning INSUFFICIENT_CONTEXT"}],
+        }
+
     context = "\n\n---\n\n".join(
         f"[Chunk {i+1}] {doc.page_content}"
         for i, doc in enumerate(state["documents"])
